@@ -1,15 +1,18 @@
-from django.shortcuts import render
-from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import AccessToken
 
-from authentication.serializers import MyTokenObtainPairSerializer
+from authentication.models import User
+from authentication.serializers import LoginSerializer
 
 
-
-# Create your views here.
-class MyObtainTokenPairView(TokenObtainPairView):
-    permission_classes = (AllowAny,)
-    serializer_class = MyTokenObtainPairSerializer
-    # refresh = RefreshToken.for_user()
+class LoginView(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user_id = serializer.validated_data['id']
+            user = User(id=user_id)
+            token = AccessToken.for_user(user)
+            return Response({'token': str(token), 'user_id': user_id}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
