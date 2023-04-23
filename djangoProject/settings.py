@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+import datetime
+import os
 
 from pathlib import Path
 from datetime import timedelta
@@ -43,12 +45,15 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     'authentication.apps.AuthConfig',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'rest_framework_simplejwt.token_blacklist'
 
 ]
+WHITENOISE_AUTOREFRESH = True
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -60,13 +65,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-]
+    "whitenoise.middleware.WhiteNoiseMiddleware"
 
+]
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days = 14),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=14),
     "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
+    "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": False,
 
     "ALGORITHM": "HS256",
@@ -91,7 +97,7 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
 
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(days=14),
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=14),
 
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
@@ -202,13 +208,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    }
 ]
 
 # Internationalization
@@ -225,10 +225,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "authentication.User"
+
+
+# Actual directory user files go to
+STATIC_ROOT = os.path.join(os.path.dirname(__file__), '../images')
+
+# URL used to access the media
+STATIC_URL = "images/"
