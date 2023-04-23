@@ -40,7 +40,6 @@ REST_FRAMEWORK = {
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -50,7 +49,8 @@ INSTALLED_APPS = [
     'authentication.apps.AuthConfig',
     'rest_framework',
     'corsheaders',
-    'rest_framework_simplejwt.token_blacklist'
+    'rest_framework_simplejwt.token_blacklist',
+    "user.apps.UserConfig"
 
 ]
 WHITENOISE_AUTOREFRESH = True
@@ -230,7 +230,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-AUTH_USER_MODEL = "authentication.User"
+AUTH_USER_MODEL = "user.User"
 
 
 # Actual directory user files go to
