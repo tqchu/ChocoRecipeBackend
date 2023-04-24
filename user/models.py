@@ -4,7 +4,7 @@ from django.db import models
 
 # Create your models here.
 class User(AbstractUser):
-    image = models.ImageField(upload_to='images/', null=True, blank=True)
+    image = models.ImageField(upload_to='images/user/', null=True, blank=True)
     email = models.EmailField(
                                    max_length=150,
                                    unique=True,

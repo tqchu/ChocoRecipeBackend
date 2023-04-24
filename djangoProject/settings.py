@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
-    "user.apps.UserConfig"
+    "user.apps.UserConfig",
+    "recipe.apps.RecipeConfig"
 
 ]
 WHITENOISE_AUTOREFRESH = True
@@ -180,22 +181,22 @@ LOGGING = {
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'recipe',
-#         'USER': 'root',
-#         'PASSWORD': '',
-#         'HOST': 'localhost',
-#         'PORT': '3306'
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'chocorecipe',
+        'USER': 'root',
+        'PASSWORD': 'chocorecipe',
+        'HOST': 'chocorecipe.c4j6k1v0j4st.ap-southeast-2.rds.amazonaws.com',
+        'PORT': '3306'
+    }
+}
 
 CORS_ORIGIN_ALLOW_ALL = True
 
