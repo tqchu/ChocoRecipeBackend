@@ -6,5 +6,6 @@ from djangoProject import settings
 
 urlpatterns = [
     path('auth/', include('authentication.urls')),
-    path('user/', include('user.urls'))
+    path('users/', include('user.urls')),
+    path('recipes/', include('recipe.urls'))
 ]
