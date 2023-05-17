@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     # "mysqlclient",
 ]
 WHITENOISE_AUTOREFRESH = True
-
+APPEND_SLASH = False
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
