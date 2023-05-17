@@ -26,7 +26,6 @@ def parse_sort_field(sort_field):
 
 
 class RecipeList(APIView):
-    permission_classes = [IsAuthenticated]
     def check_permissions(self, request):
 
         if (request.method == 'POST' or request.method == "PUT" or request.method == "DELETE") and not request.user.is_authenticated:
@@ -51,7 +50,7 @@ class RecipeList(APIView):
         # Searching
         if search:
             recipes = result_set.filter(
-                Q(directions__icontains=search) | Q(title__icontains=search) | Q(author__icontains=search)).annotate(
+                 Q(title__icontains=search) | Q(author__icontains=search)).annotate(
                 average_rating=Avg('reviews__rating')).order_by(sort_field)
         else:
             recipes = result_set.annotate(average_rating=Avg('reviews__rating')).order_by(sort_field)
