@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recipe.models import Ingredient, Recipe, FavoriteRecipe
-from recipe.serializers import CreateRecipeSerializer, RecipeDetailSerializer, RecipeSerializer
+from recipe.serializers import CreateRecipeSerializer, RecipeDetailSerializer, RecipeSerializer, \
+    FavoriteRecipeSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
@@ -174,3 +175,29 @@ class FavoriteRecipeList(APIView):
 
         serializer = RecipeSerializer(recipes, many=True)
         return Response(serializer.data)
+    def post(self, request):
+        serializer = FavoriteRecipeSerializer(request.user, data=request.data)
+
+        if serializer.is_valid():
+            try:
+                recipe = Recipe.objects.get(pk=request.data.get('recipe_id'))
+            except Recipe.DoesNotExist:
+                return Response({'error': 'Invalid recipe_id'}, status=status.HTTP_400_BAD_REQUEST)
+            favorite_recipe = FavoriteRecipe()
+            favorite_recipe.user = request.user
+            favorite_recipe.recipe = recipe
+            favorite_recipe.save()
+            return Response({
+                'id': favorite_recipe.id,
+            },status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class FavoriteRecipeDetail(APIView):
+    permission_classes =  [IsAuthenticated]
+    def delete(self, request, pk):
+        favorite_recipe = FavoriteRecipe.objects.get(pk=pk)
+        user_id = favorite_recipe.user_id
+        if user_id != request.user.id:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
+        favorite_recipe.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

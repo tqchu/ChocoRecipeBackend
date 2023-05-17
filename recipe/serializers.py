@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from recipe.models import Recipe, Ingredient
+from recipe.models import Recipe, Ingredient, FavoriteRecipe
 from review.serializers import ReviewDetailSerializer
 
 
@@ -75,3 +75,12 @@ class CreateRecipeSerializer(RecipeSerializer):
     
     def delete(self,instance):
         instance.delete()
+
+class FavoriteRecipeSerializer(ModelSerializer):
+    class Meta:
+        model = FavoriteRecipe
+        fields = ('id','user_id','recipe_id')
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'user_id': {'required': False}
+        }
