@@ -2,11 +2,13 @@ from django.db.models import Avg, F
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from recipe.models import Ingredient, Recipe
 from recipe.serializers import CreateRecipeSerializer, RecipeDetailSerializer, RecipeSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
+
 
 # Create your views here
 #
@@ -30,7 +32,6 @@ class RecipeList(APIView):
         if (request.method == 'POST' or request.method == "PUT" or request.method == "DELETE") and not request.user.is_authenticated:
             raise PermissionDenied()
         super().check_permissions(request)
-
     def get(self, request):
         search = request.query_params.get('keyword')
         ordering = request.query_params.get('sort_by')
@@ -57,6 +58,7 @@ class RecipeList(APIView):
 
         serializer = RecipeSerializer(recipes, many=True)
         return Response(serializer.data)
+
 
     def post(self, request):
         serializer = CreateRecipeSerializer(data=request.data)
@@ -135,8 +137,7 @@ class RecipeList(APIView):
         serializer.delete(recipe)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
-        
+
 class RecipeDetail(APIView):
     def get(self, request, pk):
         recipe = Recipe.objects.get(pk=pk)
