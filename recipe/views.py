@@ -145,3 +145,32 @@ class RecipeDetail(APIView):
         serializer = RecipeDetailSerializer(recipe)
         return Response(serializer.data)
         # return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED
+
+
+class FavoriteRecipeList(APIView):
+    permission_classes = [IsAuthenticated]
+    def check_permissions(self, request):
+
+        if (request.method == 'POST' or request.method == "PUT" or request.method == "DELETE") and not request.user.is_authenticated:
+            raise PermissionDenied()
+        super().check_permissions(request)
+    def get(self, request):
+        search = request.query_params.get('keyword')
+        ordering = request.query_params.get('sort_by')
+        result_set = Recipe.objects.filter(favoriterecipe__user=request.user)
+        # Parse sorting
+        if ordering:
+            sort_field = parse_sort_field(ordering)
+        else:
+            sort_field = 'id'
+        # Search or not, we must annotate username to author first =))
+        result_set = result_set.annotate(author=F('user__username'))
+        # Searching
+        if search:
+            result_set = result_set.filter(
+                 Q(title__icontains=search) | Q(author__icontains=search))
+
+        recipes = result_set.annotate(average_rating=Avg('reviews__rating')).annotate(num_likes=Count('favoriterecipe')).order_by(sort_field)
+
+        serializer = RecipeSerializer(recipes, many=True)
+        return Response(serializer.data)
