@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     "user.apps.UserConfig",
     "recipe.apps.RecipeConfig",
-    # "mysqlclient",
+    "review.apps.ReviewConfig"
 ]
 WHITENOISE_AUTOREFRESH = True
 APPEND_SLASH = False
