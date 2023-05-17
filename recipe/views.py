@@ -1,12 +1,10 @@
 from django.db.models import Avg, F
 from django.db.models import Q
-from django.shortcuts import render
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from recipe.models import Recipe
 from recipe.serializers import RecipeDetailSerializer, RecipeSerializer
-from rest_framework import filters
 
 
 # Create your views here
@@ -25,7 +23,6 @@ def parse_sort_field(sort_field):
 
 
 class RecipeList(APIView):
-
     def get(self, request):
         search = request.query_params.get('keyword')
         ordering = request.query_params.get('sort_by')
@@ -52,7 +49,6 @@ class RecipeList(APIView):
 
         serializer = RecipeSerializer(recipes, many=True)
         return Response(serializer.data)
-
 
 class RecipeDetail(APIView):
     def get(self, request, pk):
