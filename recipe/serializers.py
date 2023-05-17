@@ -14,9 +14,10 @@ class IngredientSerializer(ModelSerializer):
 class RecipeSerializer(ModelSerializer):
     author = serializers.CharField()
     average_rating = serializers.FloatField()
+    num_likes = serializers.IntegerField()
     class Meta:
         model = Recipe
-        fields = ('id','title','calories', 'cooking_time', 'image', 'average_rating', 'author')
+        fields = ('id','title','calories', 'cooking_time', 'image', 'average_rating', 'author', 'num_likes')
 
 
 class RecipeDetailSerializer(RecipeSerializer):
@@ -24,7 +25,7 @@ class RecipeDetailSerializer(RecipeSerializer):
     reviews = ReviewDetailSerializer(many=True, read_only=True)
     class Meta:
         model = Recipe
-        fields = ('id', 'title','ingredients', 'reviews','directions', 'calories', 'cooking_time', 'last_edited', 'image','average_rating', 'author')
+        fields = ('id', 'title','ingredients', 'reviews','directions', 'calories', 'cooking_time', 'last_edited', 'image','average_rating', 'author','num_likes')
 
 
 class CreateRecipeSerializer(RecipeSerializer):

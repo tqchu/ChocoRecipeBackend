@@ -1,9 +1,9 @@
-from django.db.models import Avg, F
+from django.db.models import Avg, F, Count
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from recipe.models import Ingredient, Recipe
+from recipe.models import Ingredient, Recipe, FavoriteRecipe
 from recipe.serializers import CreateRecipeSerializer, RecipeDetailSerializer, RecipeSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
@@ -18,7 +18,7 @@ from rest_framework.exceptions import PermissionDenied
 def parse_sort_field(sort_field):
     sort_fields = {
         'rating': '-average_rating',
-        'like': '-like',
+        'like': '-num_likes',
         'calories': '-calories',
         'quick': 'cooking_time',
     }
@@ -49,11 +49,10 @@ class RecipeList(APIView):
         result_set = result_set.annotate(author=F('user__username'))
         # Searching
         if search:
-            recipes = result_set.filter(
-                 Q(title__icontains=search) | Q(author__icontains=search)).annotate(
-                average_rating=Avg('reviews__rating')).order_by(sort_field)
-        else:
-            recipes = result_set.annotate(average_rating=Avg('reviews__rating')).order_by(sort_field)
+            result_set = result_set.filter(
+                 Q(title__icontains=search) | Q(author__icontains=search))
+
+        recipes = result_set.annotate(average_rating=Avg('reviews__rating')).annotate(num_likes=Count('favoriterecipe')).order_by(sort_field)
 
         serializer = RecipeSerializer(recipes, many=True)
         return Response(serializer.data)
@@ -142,6 +141,7 @@ class RecipeDetail(APIView):
         recipe = Recipe.objects.get(pk=pk)
         recipe.author = recipe.user.username
         recipe.average_rating = recipe.reviews.aggregate(Avg('rating'))['rating__avg']
+        recipe.num_likes = FavoriteRecipe.objects.filter(recipe=recipe).count()
         serializer = RecipeDetailSerializer(recipe)
         return Response(serializer.data)
         # return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED
