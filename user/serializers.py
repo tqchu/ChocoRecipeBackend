@@ -7,6 +7,18 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
             model = User
             fields = ['id', 'username', 'email', 'first_name', 'last_name', 'image']
+
+    def update(self,instance,validated_data):
+        instance.username = validated_data.get('username',instance.username)
+        instance.email = validated_data.get('email',instance.email)
+        instance.first_name = validated_data.get('first_name',instance.first_name)
+        instance.last_name = validated_data.get('last_name',instance.last_name)
+        instance.image = validated_data.get('image',instance.image)
+
+        instance.save()
+
+        return instance
+        
     
 class ChangePasswordSerializer(serializers.ModelSerializer):
     current = serializers.CharField(max_length=150)
