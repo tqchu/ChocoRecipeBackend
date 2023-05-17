@@ -55,7 +55,7 @@ INSTALLED_APPS = [
 
 ]
 WHITENOISE_AUTOREFRESH = True
-
+APPEND_SLASH = False
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

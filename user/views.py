@@ -8,7 +8,7 @@ from user.serializers import UserSerializer
 
 
 # Create your views here.
-class UserDetailView(APIView):
+class UserDetail(APIView):
     def get_object(self, pk):
         try:
             return User.objects.get(pk=pk)
