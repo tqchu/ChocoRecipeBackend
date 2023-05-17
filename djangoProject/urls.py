@@ -7,5 +7,6 @@ from djangoProject import settings
 urlpatterns = [
     path('auth/', include('authentication.urls')),
     path('users/', include('user.urls')),
-    path('recipes/', include('recipe.urls'))
+    path('recipes/', include('recipe.urls')),
+    path('reviews/', include('review.urls'))
 ]
