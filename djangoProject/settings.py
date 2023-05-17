@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import datetime
 import os
+# import MySQLdb
 
 from pathlib import Path
 from datetime import timedelta
@@ -51,8 +52,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
     "user.apps.UserConfig",
-    "recipe.apps.RecipeConfig"
-
+    "recipe.apps.RecipeConfig",
+    # "mysqlclient",
 ]
 WHITENOISE_AUTOREFRESH = True
 
