@@ -108,6 +108,12 @@ class RecipeList(APIView):
 
 
 class RecipeDetail(APIView):
+    def check_permissions(self, request):
+
+        if (
+                request.method == 'POST' or request.method == "PUT" or request.method == "DELETE") and not request.user.is_authenticated:
+            raise PermissionDenied()
+        super().check_permissions(request)
     def get(self, request, pk):
         try:
             recipe = Recipe.objects.get(id=pk)
