@@ -8,8 +8,10 @@ from review.serializers import ReviewDetailSerializer
 class IngredientSerializer(ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ('name','quantity','unit')
-    
+        fields = ('name','quantity','unit','recipe')
+        extra_kwargs = {
+            'recipe': {'required': True}
+        }
 
 class RecipeSerializer(ModelSerializer):
     author = serializers.CharField()
@@ -29,12 +31,11 @@ class RecipeDetailSerializer(RecipeSerializer):
 
 
 class CreateRecipeSerializer(RecipeSerializer):
-    ingredients = IngredientSerializer(many=True)
     user_id = serializers.IntegerField()
 
     class Meta:
         model = Recipe
-        fields = ('id','user_id','title', 'directions', 'calories', 'cooking_time','image', 'ingredients')
+        fields = ('id','user_id','title', 'directions', 'calories', 'cooking_time','image')
         extra_kwargs = {
             'title': {'required': True},
             'directions': {'required': True},

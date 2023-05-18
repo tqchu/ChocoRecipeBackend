@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 
 from recipe.models import Ingredient, Recipe, FavoriteRecipe
 from recipe.serializers import CreateRecipeSerializer, RecipeDetailSerializer, RecipeSerializer, \
-    FavoriteRecipeSerializer
+    FavoriteRecipeSerializer, IngredientSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
@@ -76,16 +76,6 @@ class RecipeList(APIView):
                 image=serializer.validated_data.get('image')
             )
 
-            # Create a list of ingredient objects and add them to the new recipe
-            ingredients_data = serializer.validated_data.get('ingredients')
-            for ingredient_data in ingredients_data:
-                Ingredient.objects.create(
-                    recipe=recipe,
-                    name=ingredient_data.get('name'),
-                    quantity=ingredient_data.get('quantity'),
-                    unit=ingredient_data.get('unit')
-                )
-
             serializer = CreateRecipeSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -147,7 +137,19 @@ class RecipeDetail(APIView):
         return Response(serializer.data)
         # return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED
 
-
+class IngredientList(APIView):
+    permission_classes =  [IsAuthenticated]
+    def post(self, request):
+        serializer = IngredientSerializer(data=request.data, many=True)
+        if serializer.is_valid():
+            for ingredient in serializer.validated_data:
+                if ingredient.get('recipe').user.id != request.user.id:
+                    return Response({'error': 'You are not authorized to create an ingredient for this recipe.'},
+                                status=status.HTTP_403_FORBIDDEN)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class FavoriteRecipeList(APIView):
     permission_classes = [IsAuthenticated]
     def check_permissions(self, request):
