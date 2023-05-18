@@ -106,49 +106,31 @@ class RecipeList(APIView):
             return Response(recipe_serializer.data, status= status.HTTP_200_OK)
         return Response(recipe_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request):
-        id = request.data.get('id')
-        user_id = request.data.get('user_id')
-        try:
-            recipe = Recipe.objects.get(id=id)
-        except Recipe.DoesNotExist:
-            return Response({'error': 'Recipe does not exist'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = CreateRecipeSerializer(recipe)
-
-        if user_id != request.user.id:
-            return Response({'error': 'You are not authorized to update a recipe for another user.'},
-                            status=status.HTTP_403_FORBIDDEN)
-        serializer.delete(recipe)
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 class RecipeDetail(APIView):
     def get(self, request, pk):
-        recipe = Recipe.objects.get(pk=pk)
+        try:
+            recipe = Recipe.objects.get(id=pk)
+        except Recipe.DoesNotExist:
+            return Response({'error': 'Recipe does not exist'}, status=status.HTTP_404_NOT_FOUND)
         recipe.author = recipe.user.username
         recipe.average_rating = recipe.reviews.aggregate(Avg('rating'))['rating__avg']
         recipe.num_likes = FavoriteRecipe.objects.filter(recipe=recipe).count()
         serializer = RecipeDetailSerializer(recipe)
-        return Response(serializer.data)
-        # return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED
+        return Response(serializer.data, status = status.HTTP_200_OK)
 
+    def delete(self, request, pk):
+        try:
+            recipe = Recipe.objects.get(pk=pk)
+        except Recipe.DoesNotExist:
+            return Response({'error': 'Recipe does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-class IngredientList(APIView):
-    permission_classes = [IsAuthenticated]
+        if recipe.user.id != request.user.id:
+            return Response({'error': 'You are not authorized to update a recipe for another user.'},
+                            status=status.HTTP_403_FORBIDDEN)
+        recipe.delete()
 
-    def post(self, request):
-        serializer = IngredientSerializer(data=request.data, many=True)
-        if serializer.is_valid():
-            for ingredient in serializer.validated_data:
-                if ingredient.get('recipe').user.id != request.user.id:
-                    return Response({'error': 'You are not authorized to create an ingredient for this recipe.'},
-                                    status=status.HTTP_403_FORBIDDEN)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class FavoriteRecipeList(APIView):
     permission_classes = [IsAuthenticated]
